@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>btnRobinhoodSellBTC</name>
+   <tag></tag>
+   <elementGuidId>ec220180-4d21-4710-892e-60c2223479d6</elementGuidId>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tag</name>
+      <type>Main</type>
+      <value>span</value>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>data-testid</name>
+      <type>Main</type>
+      <value>OrderFormHeading-Sell</value>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>text</name>
+      <type>Main</type>
+      <value>Sell BTC</value>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>id(&quot;react_root&quot;)/div[1]/main[@class=&quot;app&quot;]/div[3]/div[@class=&quot;c2W3_nIYgNyH3-V3bY-nF&quot;]/div[@class=&quot;_1yBehGQFRN85X80D_lH624 _3qV7vb_7YMAOMq73aShOuE&quot;]/div[@class=&quot;_1ipcyRh_90GpX78fM100Uj&quot;]/div[@class=&quot;main-container&quot;]/div[@class=&quot;row&quot;]/div[@class=&quot;col-5&quot;]/div[@class=&quot;sidebar-content&quot;]/div[@class=&quot;_2Pmzq64aRZSbuRk9bTAy8I _7qGfynPzmLSrSvaJCuhA_&quot;]/div[2]/form[@class=&quot;_10W2tNXSbYJ3v50_JYfNcZ&quot;]/div[@class=&quot;_2tCBSH92njcg2RcOagMHNr&quot;]/header[@class=&quot;card-heading _1OwnthgWFP2h__Kuped8pq&quot;]/div[@class=&quot;U9B2wa4QH-rLcDnS_0kE0 _3QY-7G160GqBazfwfs4WRp&quot;]/div[@class=&quot;_2apts2Z_f5qu0r5s31NcUI&quot;]/div[@class=&quot;_2lP6gwomUu18F6aHSMmAIu&quot;]/div[@class=&quot;_3FtsatbSW5M9Uv9PjdppHT _2TlDddTI6OHGqoRlRJHfWj&quot;]/div[@class=&quot;_2zlNYDxUnWc0a8cd9uPqqF _3pw8thVAbViQgcH556yjBl _3C-rVbIJXLhkwZJyDlN3s_ _2_JNDaIaVR34TrlKMMlTAU&quot;]/h3[@class=&quot;_3sl1gTFP42qCnEJjYpwZSm _1iW5XtlWSjKBHDf-vyRlxz&quot;]/span[1]</value>
+   </webElementProperties>
+   <webElementXpaths>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:idRelative</name>
+      <type>Main</type>
+      <value>//div[@id='react_root']/div/main/div[3]/div/div/div/div/div/div[2]/div/div/div[2]/form/div/header/div/div/div/div[2]/div/h3/span</value>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Buy BTC'])[1]/following::span[1]</value>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='$139.45'])[2]/following::span[1]</value>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Amount in'])[1]/preceding::span[2]</value>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='$7,952.17'])[1]/preceding::span[3]</value>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:position</name>
+      <type>Main</type>
+      <value>//h3/span</value>
+   </webElementXpaths>
+</WebElementEntity>

@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<WebElementEntity>
+   <description></description>
+   <name>btnRobinhoodBTCReview</name>
+   <tag></tag>
+   <elementGuidId>5799acb2-c2db-4280-a73f-c2545a8ae617</elementGuidId>
+   <selectorCollection>
+      <entry>
+         <key>BASIC</key>
+         <value>//*[(text() = 'Review Order' or . = 'Review Order')]</value>
+      </entry>
+   </selectorCollection>
+   <selectorMethod>BASIC</selectorMethod>
+   <useRalativeImagePath>false</useRalativeImagePath>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>tag</name>
+      <type>Main</type>
+      <value>button</value>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>type</name>
+      <type>Main</type>
+      <value>submit</value>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>class</name>
+      <type>Main</type>
+      <value>_1OsoaRGpMCXh9KT8s7wtwm _2GHn41jUsfSSC9HmVWT-eg</value>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>text</name>
+      <type>Main</type>
+      <value>Review Order</value>
+   </webElementProperties>
+   <webElementProperties>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath</name>
+      <type>Main</type>
+      <value>id(&quot;react_root&quot;)/div[1]/main[@class=&quot;app&quot;]/div[3]/div[@class=&quot;c2W3_nIYgNyH3-V3bY-nF&quot;]/div[@class=&quot;_1yBehGQFRN85X80D_lH624 _3qV7vb_7YMAOMq73aShOuE&quot;]/div[@class=&quot;_1ipcyRh_90GpX78fM100Uj&quot;]/div[@class=&quot;main-container&quot;]/div[@class=&quot;row&quot;]/div[@class=&quot;col-5&quot;]/div[@class=&quot;sidebar-content&quot;]/div[@class=&quot;_2Pmzq64aRZSbuRk9bTAy8I _7qGfynPzmLSrSvaJCuhA_&quot;]/div[2]/form[@class=&quot;_10W2tNXSbYJ3v50_JYfNcZ&quot;]/div[@class=&quot;_2tCBSH92njcg2RcOagMHNr&quot;]/div[@class=&quot;theme-crypto-down&quot;]/div[@class=&quot;_12twrCe63gAlKhIEnrTzIf _167T9zawWgojY3Z1O0xGiA _3bPxUyk3G5Xrde2pmYOBda&quot;]/div[@class=&quot;_2FuMYm7qpszdIBO9N56SlF&quot;]/button[@class=&quot;_3kh8OsNx6QdAbMaoKTi2Yq _1uaripz9PIQ8yApSTs6BKk&quot;]</value>
+   </webElementProperties>
+   <webElementXpaths>
+      <isSelected>true</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:attributes</name>
+      <type>Main</type>
+      <value>//button[@type='submit']</value>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:idRelative</name>
+      <type>Main</type>
+      <value>//div[@id='react_root']/div/main/div[3]/div/div/div/div/div/div[2]/div/div/div[2]/form/div/div[2]/div[2]/div/button</value>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Estimated BTC'])[1]/following::button[1]</value>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='$7,960.72'])[1]/following::button[1]</value>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:neighbor</name>
+      <type>Main</type>
+      <value>(.//*[normalize-space(text()) and normalize-space(.)='Remove from Watchlist'])[1]/preceding::button[1]</value>
+   </webElementXpaths>
+   <webElementXpaths>
+      <isSelected>false</isSelected>
+      <matchCondition>equals</matchCondition>
+      <name>xpath:position</name>
+      <type>Main</type>
+      <value>//button</value>
+   </webElementXpaths>
+</WebElementEntity>

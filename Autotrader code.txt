@@ -1,0 +1,936 @@
+//THIS PROGRAM WAS WRITTEN BY DYLAN DEFLORIO
+
+
+import java.awt.BorderLayout;
+import java.awt.EventQueue;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+
+import javax.swing.DefaultListModel;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTextField;
+
+
+import static com.kms.katalon.core.testobject.ObjectRepository.findTestObject
+
+import java.text.DateFormat
+import java.text.NumberFormat
+import java.text.SimpleDateFormat
+
+import org.openqa.selenium.By
+import org.openqa.selenium.WebDriver
+import org.openqa.selenium.WebElement
+
+import com.kms.katalon.core.webui.driver.DriverFactory
+import com.kms.katalon.core.webui.keyword.WebUiBuiltInKeywords as WebUI
+
+import internal.GlobalVariable
+
+import java.util.regex.Matcher
+import java.util.regex.Pattern
+
+driverFunc()
+
+//public class BTCTrading {
+	void driverFunc() {
+		//sign into Robinhood - WAITS FOR USER LOGIN FOR NOW
+		signIntoRobinhood()
+
+		//go to the Bitcoin (BTC) page, function called in here also finds valuable trading data on the page. Call this when needing to reset if needed
+		goToBitcoinPage()
+
+	}
+
+	void signIntoRobinhood() {
+		//open Robinhood login page and maximize the window
+		WebUI.openBrowser('https://robinhood.com/login')
+		WebUI.maximizeWindow()
+
+		//provide login info, copy latest gmail body to a String, get robinhood verification code from the email, put the code into the field
+
+		//type in email address used with Robinhood
+		WebUI.setText(findTestObject('Shared/Fields/fieldRobinhoodEmail'), '')
+
+		//type in encrypted password
+		WebUI.setEncryptedText(findTestObject('Shared/Fields/fieldRobinhoodPassword'), '')
+
+		//click sign in button
+		WebUI.click(findTestObject('Shared/Buttons/btnRobinhoodSignIn'))
+		
+		//click SMS button
+		WebUI.click(findTestObject('Shared/Buttons/btnRobinhoodSendSMS'))
+
+		/*
+		//click to send an email with verification code
+		WebUI.click(findTestObject('Shared/Buttons/btnRobinhoodSendEmail'))
+
+		//wait 10 seconds for email to be recieved - COPY VERIFICATION CODE FROM THE EMAIL DURING THE DELAY TIME
+		WebUI.delay(2)
+
+
+		
+		 //assign the text in the body of the email to a String (email, password, inbox)
+		 def body = CustomKeywords.'com.testwithhari.katalon.plugins.Gmail.readLatestEMailBodyContent'("", "", "Inbox")
+		 //define a String (Char Sequence) to be the first element of the code found in the email body
+		 def tempCode
+		 //define a String to be the second element of the first element of the code found email body
+		 def verificationCode
+		 //Matcher Class will match the requested regex in the email body String to a variable
+		 Matcher bodyMatcher = Pattern.compile(/(\d{6})/).matcher(body)
+		 //set a temp String equal to the first element of the regex matcher, it has the code in there twice
+		 tempCode = bodyMatcher[0]
+		 //set the code itself equal to the second element in the array, exclusively contains the code
+		 verificationCode = tempCode[1]
+		 //type the verification code into the field
+		 WebUI.setText(findTestObject('Shared/Fields/fieldRobinhoodVerificationCodeResponse'), verificationCode)
+		 //click to sconfirm verification code and wait for the page to load
+		 WebUI.click(findTestObject('Shared/Buttons/btnRobinhoodConfirmVerification'))
+		 */
+
+
+		WebUI.delay(45)
+	}
+
+
+	//go to Bitcoin page
+	void goToBitcoinPage()
+	{
+		//initlize and declare trading data variables used for buying and/or selling depending on the variable
+		float currentBuyingPower = 0
+		float currentEquity = 0
+		float yourAverageCost = 0
+		float currentEstimatedBTCPrice = 0
+		float hourlySwingDollars = 0
+		float hourlySwingPercentage = 0
+		float totalBTCOwned = 0
+		float totalReturnDollars = 0
+		float totalReturnPercentage = 0
+
+		//two arrays containing the trading data buying and selling respectively
+		float[] tradingBuyDataList
+		float[] tradingSellDataList
+
+		
+		/*
+		GUI STUFF FOR FUTURE IMPLMENTATION
+		 
+		ProgramStatus status = ProgramStatus.STOPPED;
+		PurchaseStatus purchaseStatus = PurchaseStatus.NOEQUITY;
+		double stopLosspercent = 0.01;
+		String currentProfit = "+0% + 0.00\$";
+		StockAutomationInterface Gui;
+
+		Gui = new StockAutomationInterface(this);
+		*/
+		
+		
+		//initialize and declare a boolean that detects if it is the first time getTradingData has been run yet on this programs run
+		boolean firstTime = true
+
+		//go to the BTC URL
+		WebUI.navigateToUrl('https://robinhood.com/crypto/BTC')
+
+		WebUI.delay(2)
+
+		//click on the "Live" button to see BTC in the last hour
+		WebUI.click(findTestObject('Shared/Buttons/btnRobinhoodBTCLive'))
+
+
+		//think about right here being the place for an isUpdating loop
+
+
+		//continue to buy/sell until total loss > -10
+		while (totalReturnDollars > -10)
+		{
+			//try to click the "Sell" button. If the button is there, that means you own BTC. I do not want the computer to buy more at the time. Run the appropriate methods to collect data and make a decsion
+			try
+			{
+				//wait a second for Live page to catch up, and try to click the Sell BTC tab, if not there, decide how much to buy
+				WebUI.delay(2)
+				WebUI.verifyElementPresent(findTestObject('Shared/Buttons/btnRobinhoodSellBTC'), 3)
+
+				//get key data off page needed for trading, calls sub methods to get the data
+				tradingSellDataList = getSellTradingData(firstTime, GlobalVariable.highestCurrentEquity, GlobalVariable.highestHourlySwingDollars, GlobalVariable.previousHighestHourlySwingDollars, GlobalVariable.highestHourlySwingPercentage, GlobalVariable.previousHighestHourlySwingPercentage, GlobalVariable.highestTotalReturnDollars, GlobalVariable.highestTotalReturnPercentage)
+			}
+
+			//if cannot click sell button, means you own no BTC. This catch will buy 1/3 of your buying power. Should be total portfolio value soon ;)
+			catch (Exception e)
+			{
+				//if no sell button, run trading data on when to buy
+				tradingBuyDataList = getBuyTradingData(firstTime, GlobalVariable.highestHourlySwingDollars, GlobalVariable.previousHighestHourlySwingDollars, GlobalVariable.highestHourlySwingPercentage, GlobalVariable.previousHighestHourlySwingPercentage)
+			}
+		}
+	}
+
+
+	public float[] getBuyTradingData(boolean firstTime, float highestHourlySwingDollars, float previousHighestHourlySwingDollars, float highestHourlySwingPercentage, float previousHighestHourlySwingPercentage)
+	{
+		//final constants for applying to variables to find out when buying should occur
+		final float BUYDROPTOTALPERCENTAGE = 0.05
+
+		final float BUYDROPTOTALFIXED = 0.2
+
+		//instances of Classes needed throughout OOP
+		WebDriver driver = DriverFactory.getWebDriver()
+		NumberFormat format
+		Number number
+
+		//Initialize and define needed variables on the page. Takes the text value from its web object and converts it to a float in their respective functions. If first time this function is ran, set the maxes to the currents
+		float currentBuyingPower = 0
+		float currentEstimatedBTCPrice = 0
+		float hourlySwingDollars = 0
+		float hourlySwingPercentage = 0
+
+		//declare a list to compile all the floats into
+		float[] tradingBuyDataList = new float[15]
+
+		WebUI.delay(1)
+		
+		//temp for now, did this to test if it functions
+		//call each individual function to define each variable
+		currentBuyingPower = getCurrentBuyingPower(currentBuyingPower)
+		//load this element in the array with the necessary variable
+		tradingBuyDataList[0] = currentBuyingPower
+
+
+		//call each individual function to define each variable
+		currentEstimatedBTCPrice = getCurrentEstimatedBTCPrice(currentEstimatedBTCPrice)
+		//load this element in the array with the necessary variable
+		tradingBuyDataList[1] = currentEstimatedBTCPrice
+		
+		WebUI.delay(10)
+
+		//while these conditions are true, the Buy Trading Data is being updated. If these conditions are broken, an attempt to buy will be made
+		//while (hourlySwingPercentage - BUYDROPTOTALPERCENTAGE > highestHourlySwingPercentage || firstTime == true)
+		while (hourlySwingPercentage >= highestHourlySwingPercentage * 0.99 || firstTime == true)
+		{
+			//call each individual function to define each variable
+			currentBuyingPower = getCurrentBuyingPower(currentBuyingPower)
+			//load this element in the array with the necessary variable
+			tradingBuyDataList[0] = currentBuyingPower
+
+
+			//call each individual function to define each variable
+			currentEstimatedBTCPrice = getCurrentEstimatedBTCPrice(currentEstimatedBTCPrice)
+			//load this element in the array with the necessary variable
+			tradingBuyDataList[1] = currentEstimatedBTCPrice
+
+
+			//call each individual function to define each variable
+			hourlySwingDollars = getHourlySwingDollars(hourlySwingDollars)
+			//load this element in the array with the necessary variable
+			tradingBuyDataList[2] = hourlySwingDollars
+
+
+			//if the current is higher than the max, or if its the first time this function has run, set the max to the current
+			if (hourlySwingDollars > highestHourlySwingDollars || firstTime == true)
+			{
+				//previous highest is now highest
+				previousHighestHourlySwingDollars = highestHourlySwingDollars
+				//load this element in the array with the necessary variable
+				tradingBuyDataList[3] = previousHighestHourlySwingDollars
+				
+				highestHourlySwingDollars = hourlySwingDollars
+				//load this element in the array with the necessary variable
+				tradingBuyDataList[4] = highestHourlySwingDollars
+			}
+			//Tell the user what the highest change in BTC price in dollars is since the program began running
+			//println("Highest Hourly Swing in Dollars: " + tradingBuyDataList[3])
+
+
+			//call each individual function to define each variable
+			hourlySwingPercentage = getHourlySwingPercentage(hourlySwingPercentage)
+			//load this element in the array with the necessary variable
+			tradingBuyDataList[5] = hourlySwingPercentage
+
+
+			//if the current is higher than the max, or if its the first time this function has run, set the max to the current
+			if (hourlySwingPercentage > highestHourlySwingPercentage || firstTime == true)
+			{
+				//previous highest is now highest
+				previousHighestHourlySwingPercentage = highestHourlySwingPercentage
+				//load this element in the array with the necessary variable
+				tradingBuyDataList[6] = previousHighestHourlySwingPercentage
+				
+				highestHourlySwingPercentage = hourlySwingPercentage
+				//load this element in the array with the necessary variable
+				tradingBuyDataList[7] = highestHourlySwingPercentage
+			}
+			//Tell the user what the highest change in BTC price as a percent is since the program began running
+			//println("Highest Hourly Swing Percentage: " + tradingBuyDataList[5])
+
+
+			//since the execution of finding the data is done with, set first time to false
+			firstTime = false
+
+			//println("\nBuy Data List: " + tradingBuyDataList + "\n")
+		}
+
+		//if broken from while loop, then it is time to buy
+		buyBTC(tradingBuyDataList[0], tradingBuyDataList[1])
+
+		return tradingBuyDataList
+	}
+
+
+	public float[] getSellTradingData(boolean firstTime, float highestCurrentEquity, float highestHourlySwingDollars, float previousHighestHourlySwingDollars, float highestHourlySwingPercentage, float previousHighestHourlySwingPercentage, float highestTotalReturnDollars, float highestTotalReturnPercentage)
+	{
+		//final constants for applying to variables to find out when selling should occur
+		final float SELLDROPTOTALPERCENTAGE = 1.0
+		final float SELLGAINTOTAL = 0.02
+
+		final float SELLDROPTOTAL = 0.1
+		final float SELLGAINTOTALFIXED = 0.5
+
+		//instances of Classes needed throughout OOP
+		WebDriver driver = DriverFactory.getWebDriver()
+		NumberFormat format
+		Number number
+
+		//Initialize and define needed variables on the page. Takes the text value from its web object and converts it to a float in their respective functions. If first time this function is ran, set the maxes to the currents
+		float currentBuyingPower = 0
+		float currentEquity = 0
+		float yourAverageCost = 0
+		float currentEstimatedBTCPrice = 0
+		float hourlySwingDollars = 0
+		float hourlySwingPercentage = 0
+		float totalBTCOwned = 0
+		float totalReturnDollars = 0
+		float totalReturnPercentage = 0
+		float costOfBTCPurchased = 0
+
+		//declare a list to compile all the floats into
+		//pull how much buying power you have off the page
+		float[] tradingSellDataList = new float[15]
+
+		firstTime = true
+
+		//Create instance of SimpleDateFormat class and decide the format
+		//DateFormat dateFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss");
+
+		//get current date time with Date() classes
+		//Date dateAndTime = new Date();
+
+		//String to represent what is printed
+		//String dateAndTimeDisplay
+
+		WebUI.refresh()
+
+		//make sure you're on the correct tab
+		WebUI.click(findTestObject('Shared/Buttons/btnRobinhoodSellBTC'))
+
+		WebUI.delay(1)
+
+		//for now
+		currentEquity = getCurrentEquity(currentEquity)
+		//load this element in the array with the necessary variable
+		tradingSellDataList[1] = currentEquity
+		
+		WebUI.delay(12)
+		
+		
+		//while these conditions are true, the Buy Trading Data is being updated. If these conditions are broken, an attempt to buy will be made
+		//while ((hourlySwingPercentage + SELLGAINTOTALPERCENTAGE < highestHourlySwingPercentage && hourlySwingPercentage < highestHourlySwingPercentage - SELLDROPTOTALPERCENTAGE) || firstTime == true)
+		//ORIGNIALLY -.10 AND +.02
+		
+		
+		while ((  totalReturnDollars > highestTotalReturnDollars - 0.01 &&  totalReturnDollars > highestTotalReturnDollars + 0.01 ) || firstTime == true)
+		{
+			//call each individual function to define each variable
+			currentBuyingPower = getCurrentBuyingPower(currentBuyingPower)
+			//load this element in the array with the necessary variable
+
+			tradingSellDataList[0] = currentBuyingPower
+
+			//call each individual function to define each variable
+			currentEquity = getCurrentEquity(currentEquity)
+			//load this element in the array with the necessary variable
+			tradingSellDataList[1] = currentEquity
+
+			//if the current is higher than the max, or if its the first time this function has run, set the max to the current
+			if (currentEquity > highestCurrentEquity || firstTime == true)
+			{
+				highestCurrentEquity = currentEquity
+				//load this element in the array with the necessary variable
+				tradingSellDataList[2] = highestCurrentEquity
+			}
+			//Tell the user what the highest chnage in BTC value as a percent is since the program began running
+			//println("Highest Current Equity: " + tradingSellDataList[2])
+
+			//call each individual function to define each variable
+			yourAverageCost = getYourAverageCost(yourAverageCost)
+			//load this element in the array with the necessary variable
+			tradingSellDataList[3] = yourAverageCost
+
+			//call each individual function to define each variable
+			currentEstimatedBTCPrice = getCurrentEstimatedBTCPrice(currentEstimatedBTCPrice)
+			//load this element in the array with the necessary variable
+			tradingSellDataList[4] = currentEstimatedBTCPrice
+
+			//call each individual function to define each variable
+			hourlySwingDollars = getHourlySwingDollars(hourlySwingDollars)
+			//load this element in the array with the necessary variable
+			tradingSellDataList[5] = hourlySwingDollars
+
+			//if the current is higher than the max, or if its the first time this function has run, set the max to the current
+			if (hourlySwingDollars > highestHourlySwingDollars || firstTime == true)
+			{
+				highestHourlySwingDollars = hourlySwingDollars
+				//load this element in the array with the necessary variable
+				tradingSellDataList[6] = highestHourlySwingDollars
+			}
+			//Tell the user what the highest change in BTC price is since the program began running
+			//println("Highest Hourly Swing in Dollars: " + highestHourlySwingDollars)
+
+			//call each individual function to define each variable
+			hourlySwingPercentage = getHourlySwingPercentage(hourlySwingPercentage)
+			//load this element in the array with the necessary variable
+			tradingSellDataList[7] = hourlySwingPercentage
+
+			//if the current is higher than the max, or if its the first time this function has run, set the max to the current
+			if (hourlySwingPercentage > highestHourlySwingPercentage || firstTime == true)
+			{
+				highestHourlySwingPercentage = hourlySwingPercentage
+				//load this element in the array with the necessary variable
+				tradingSellDataList[8] = highestHourlySwingPercentage
+			}
+			//Tell the user what the highest chnage in BTC value as a percent is since the program began running
+			//println("Highest Hourly Swing Percentage: " + tradingSellDataList[7])
+
+			//call each individual function to define each variable
+			totalBTCOwned = getTotalBTCOwned(totalBTCOwned)
+			//load this element in the array with the necessary variable
+			tradingSellDataList[9] = totalBTCOwned
+
+			//call each individual function to define each variable
+			totalReturnDollars = getTotalReturnDollars(totalReturnDollars)
+			//load this element in the array with the necessary variable
+			tradingSellDataList[10] = totalReturnDollars
+
+			//if the current is higher than the max, or if its the first time this function has run, set the max to the current
+			if (totalReturnDollars > highestTotalReturnDollars || firstTime == true)
+			{
+				highestTotalReturnDollars = totalReturnDollars
+				//load this element in the array with the necessary variable
+				tradingSellDataList[11] = highestTotalReturnDollars
+			}
+			//Tell the user what the highest total return in dollars is since the program began running
+			//println("Highest Total Return in Dollars: " + tradingSellDataList[10])
+
+			//call each individual function to define each variable
+			totalReturnPercentage = getTotalReturnPercentage(totalReturnPercentage)
+			//load this element in the array with the necessary variable
+			tradingSellDataList[12] = totalReturnPercentage
+
+			//if the current is higher than the max, or if its the first time this function has run, set the max to the current.
+			if (totalReturnPercentage > highestTotalReturnPercentage || firstTime == true)
+			{
+				highestTotalReturnPercentage = totalReturnPercentage
+				//load this element in the array with the necessary variable
+				tradingSellDataList[13] = highestTotalReturnPercentage
+			}
+			//Tell the user what the highest return percentage is since the program began running
+			//println("Highest Return Percentage: " + tradingSellDataList[12])
+
+			//call each individual function to define each variable
+			costOfBTCPurchased = getCostOfBTCPurchased(costOfBTCPurchased)
+			//load this element in the array with the necessary variable
+			tradingSellDataList[14] = costOfBTCPurchased
+
+			//since the execution of finding the data is done with, set first time to false
+			firstTime = false
+
+			// Now format the date
+			//dateAndTimeDisplay = dateFormat.format(dateFormat);
+
+			//print the contents of the list and the time to the console so the user can see
+			//println("\nSell Data List: " + tradingSellDataList + " @ ") //+ dateAndTimeDisplay + "\n")
+		}
+		
+		
+		//if broken from while loop, then it is time to sell
+		sellBTC(tradingSellDataList[1])
+
+		//return the list of all the data required to find when to sell
+		return tradingSellDataList
+	}
+
+
+	//function performs the action of literally buying the BTC. Does not deposit from bank account intentionally
+	void buyBTC(float currentBuyingPower, float currentEquity)
+	{
+		//if there is less than $1 of equity, something weird happened and this func should not try to buy more
+		//if (currentEquity < 1)
+			//return
+
+		//Not supposed to use more than 2% of your current buying power to buy BTC with
+		float purchaseAllottment = currentBuyingPower / 5
+
+		//change to a string so it can be put in setText as a parameter
+		String purchaseAllottmentStr = new Float(purchaseAllottment).toString()
+
+		//set the string as the text element of the field
+		WebUI.setText(findTestObject('Shared/Fields/fieldRobinhoodEnterBTCAmount'), purchaseAllottmentStr)
+
+		//click review button
+		WebUI.click(findTestObject('Shared/Buttons/btnRobinhoodBTCReview'))
+
+		WebUI.delay(1)
+
+		//click Submit Buy to confirm purchase
+		WebUI.click(findTestObject('Shared/Buttons/btnRobinhoodSubmitBuy'))
+
+		//tell the user what they've purchased BTC at, wait a couple seconds for the page to load after the purchase, and refresh
+		println("\nBTC BOUGHT AT: " + purchaseAllottment + "\n")
+
+		WebUI.delay(3)
+
+		WebUI.refresh()
+
+		WebUI.waitForPageLoad(2)
+	}
+
+
+	void sellBTC(float currentEquity)
+	{
+		//exit func if there is no equity (cant sell with zero equity)
+		if (currentEquity == 0)
+			return
+
+		//98% of total equity will trigger the "Are you trying to sell all of your BTC" pop up and wont go over if your equity drops when this func is called
+		float amountToSell = currentEquity * 0.97
+
+		//change to a string so it can be put in setText as a parameter
+		String amountToSellStr = new Float(amountToSell).toString()
+
+		//set the string as the text element of the field
+		WebUI.setText(findTestObject('Shared/Fields/fieldRobinhoodEnterBTCAmount'), amountToSellStr)
+		
+		WebUI.delay(2)
+
+		//try to click the back button if it exists. If so, click the button an try to sell again. If not, continue on
+		try
+		{
+			//if BTC price drops while selling and ypou dont have enough, click back button
+			if (WebUI.verifyElementPresent(findTestObject('Shared/Buttons/btnRobinhoodSellBTCBack'), 3))
+			{
+				//click the back button since it popped up
+				WebUI.click(findTestObject('Shared/Buttons/btnRobinhoodSellBTCBack'))
+
+				//call sell func again b/c the price of BTC dropped and you cant sell it for its current price
+				//dont need this cuz the finally will run regardless
+				//sellBTC(currentEquity)
+
+				//return
+			}
+		}
+		finally
+		{
+			//click review button
+			WebUI.click(findTestObject('Shared/Buttons/btnRobinhoodBTCReview'))
+
+			WebUI.delay(2)
+
+			//click yes button when it asks if you want to sell all your bitcoin
+			WebUI.click(findTestObject('Shared/Buttons/btnRobinhoodYesSellAll'))
+
+			//hit the submit sell button
+			WebUI.click(findTestObject('Shared/Buttons/btnRobinhoodSubmitSellAllBTC'))
+
+			//print to the console what price the BTC was sold at
+			println("\nBTC SOLD AT: " + currentEquity + "\n")
+
+			//wait three secs for it to load while selling
+			WebUI.delay(3)
+
+			//refresh the page and wait a second for site to catch up and get ready to run highest level loop again
+			WebUI.refresh()
+
+			WebUI.waitForPageLoad(2)
+		}
+	}
+
+
+	//GET DATA METHODS BELOW. TEMP VARIABLES ARE CREATED TO CONVERT THE FLOATS TO STRINGS AND BACK AGAIN
+
+
+	//GETS CURRENT BUYING POWER----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+	float getCurrentBuyingPower(float currentBuyingPower)
+	{
+		//instances of Classes needed throughout OOP
+		WebDriver driver = DriverFactory.getWebDriver()
+		NumberFormat format
+		Number number
+
+		//convert the float parameter to a temp String to pull the text value off the page
+		String tempcurrentBuyingPower = Float.toString(currentBuyingPower)
+
+		//pull how much buying power you have off the page
+		List < WebElement > currentBuyingPowerList = driver.findElements(By.xpath("//footer[@class='Mka20HPL1AcmlkmLllKih']"))
+
+		//saves your BTC equity as a variable. it is the first element in this list
+		tempcurrentBuyingPower = currentBuyingPowerList.get(0).getText()
+
+		//remove dollar sign and any commas from the value
+		format = NumberFormat.getCurrencyInstance()
+		number = format.parse(tempcurrentBuyingPower)
+
+		//current equity value set to the proper float value of the currency
+		tempcurrentBuyingPower = number
+
+		//convert String/Number to a float to do math on this later
+		currentBuyingPower = Float.parseFloat(tempcurrentBuyingPower)
+
+		//debug value testing
+		println("buying power: " + currentBuyingPower)
+
+		//return requested float
+		return currentBuyingPower
+	}
+
+	//GETS CURRENT EQUITY----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+	float getCurrentEquity(float currentEquity)
+	{
+		//instances of Classes needed throughout OOP
+		WebDriver driver = DriverFactory.getWebDriver()
+		NumberFormat format
+		Number number
+
+		//convert the float parameter to a String to pull the text value off the page
+		String tempcurrentEquity = Float.toString(currentEquity)
+
+		//Create list of  elements involved in current equity. THE SECOND ELEMENT IS THE VALUE OF AVERAGE COST. REDECLARED BELOW
+		List < WebElement > currentEquityAndAverageCostList = driver.findElements(By.xpath("//footer[@class='Mka20HPL1AcmlkmLllKih']"))
+
+		//saves your BTC equity as a variable. it is the first element in this list
+		tempcurrentEquity = currentEquityAndAverageCostList.get(0).getText()
+
+		//remove dollar sign and any commas from the value
+		format = NumberFormat.getCurrencyInstance()
+		number = format.parse(tempcurrentEquity)
+
+		//current equity value set to the proper float value of the currency
+		tempcurrentEquity = number
+
+		//convert String/Number to a float to do math on this later
+		currentEquity = Float.parseFloat(tempcurrentEquity)
+
+		//debug value testing
+		println("current equity: " + currentEquity)
+
+		//return requested float
+		return currentEquity
+	}
+
+	//GETS CURRENT VALUE OF ONE BTC @ PRICE YOU BOUGHT IT AT ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+	float getYourAverageCost(float yourAverageCost)
+	{
+		//instances of Classes needed throughout OOP
+		WebDriver driver = DriverFactory.getWebDriver()
+		NumberFormat format
+		Number number
+
+		//convert the float parameter to a String to pull the text value off the page
+		String tempyourAverageCost = Float.toString(yourAverageCost)
+
+		//Create list of  elements involved in finding the average cost of one BTC for the price you have paid. THE SECOND ELEMENT IS THE VALUE OF AVERAGE COST. REDECLARED TO AVOID USING THE LIST AS PARAMETER
+		List < WebElement > currentEquityAndAverageCostList = driver.findElements(By.xpath("//h2[@class='_16Nq52hq5o_UMk9xgkzKc-']"))
+
+		//saves your Average BTC Cost as a variable. It is the second element in this list (after equity)
+		tempyourAverageCost = currentEquityAndAverageCostList.get(1).getText()
+
+		//remove dollar sign and any commas from the value
+		format = NumberFormat.getCurrencyInstance()
+		number = format.parse(tempyourAverageCost)
+
+		//current equity value set to the proper float value of the currency
+		tempyourAverageCost = number
+
+		//convert String/Number to a float to do math on this later
+		yourAverageCost = Float.parseFloat(tempyourAverageCost)
+
+		//debug value testing
+		//println("Your Average Cost: " + yourAverageCost)
+
+		//return requested float
+		return yourAverageCost
+	}
+
+
+	//GETS CURRENT BTC PRICE----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+	float getCurrentEstimatedBTCPrice(float currentEstimatedBTCPrice)
+	{
+		//instances of Classes needed throughout OOP
+		WebDriver driver = DriverFactory.getWebDriver()
+		NumberFormat format
+		Number number
+
+		//convert the float parameter to a String to pull the text value off the page
+		String tempcurrentEstimatedBTCPrice = Float.toString(currentEstimatedBTCPrice)
+
+		//Make list of elements involved in the current BTC price
+		List < WebElement > currentBTCPriceList = driver.findElements(By.xpath("//span[@class='css-15ltlny']"))
+
+		//variable for the current price of BTC. NOT SURE IF SHOULD BE FIRST OR SECOND ELEMENT HERE OR IF SHOULD LOOK FOR ABOVE CLASS NAME
+		tempcurrentEstimatedBTCPrice = currentBTCPriceList.get(0).getText()
+
+		//remove dollar sign and any commas from the value
+		//format = NumberFormat.getCurrencyInstance()
+		//number = format.parse(tempcurrentEstimatedBTCPrice)
+
+		//current equity value set to the proper currency value
+		tempcurrentEstimatedBTCPrice = number
+
+		//convert String/Number to a float to do math on this later
+		//currentEstimatedBTCPrice = Float.parseFloat(tempcurrentEstimatedBTCPrice)
+
+		//debug value testing
+		println("BTCPrice: " + currentEstimatedBTCPrice)
+
+		//return requested float
+		return currentEstimatedBTCPrice
+	}
+
+	//GETS HOURLY SWING IN DOLLARS----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+	float getHourlySwingDollars(float hourlySwingDollars)
+	{
+		//instances of Classes needed throughout OOP
+		WebDriver driver = DriverFactory.getWebDriver()
+		NumberFormat format
+		Number number
+
+		//convert the float parameter to a String to pull the text value off the page
+		String temphourlySwingDollars = Float.toString(hourlySwingDollars)
+
+		//Make list of elements involved in the change in price of BTC in the last hour
+		List < WebElement > hourlySwingDollarsList = driver.findElements(By.xpath("//div[@class='_27rSsse3BjeLj7Y1bhIE_9']"))
+
+		//variable representing the sign of the hourly BTC return in dollars, % and text after both with a space between all
+		String hourlySwingVariables = hourlySwingDollarsList.get(0).getText()
+
+		//debug value testing for group text value
+		//println("Hourly Swing Dollars and Percentage: " + hourlySwingVariables)
+
+		//break the String of the price and the Percentage into two parts, exclude text at the end as the third part
+		String[] parts = hourlySwingVariables.split(" ", 3)
+
+		//variable for the current price of BTC. First element is the sign of the value
+		temphourlySwingDollars = parts[0]
+
+		//now you have the string, need to remove the dollar sign so you can parse it.
+		StringBuffer buf = new StringBuffer(temphourlySwingDollars.length() - 1)
+
+		//Use instance of StringBuffer class to append the two parts of the string around the dollar sign
+		buf.append(temphourlySwingDollars.substring(0, 1)).append(temphourlySwingDollars.substring(2))
+
+		//set the instance of StringBuffer to a String, and assign the hourly change in dollars to that
+		temphourlySwingDollars = buf.toString()
+
+		//remove any commas from the value
+		temphourlySwingDollars = temphourlySwingDollars.replace(",", "")
+
+		//convert that String to a float to later do math on it
+		hourlySwingDollars = Float.parseFloat(temphourlySwingDollars)
+
+		//debug value testing
+		//println("Hourly Swing in Dollars: " + hourlySwingDollars)
+
+		//return float requested
+		return hourlySwingDollars
+	}
+
+	//GETS HOURLY SWING PERCENTAGE----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+	float getHourlySwingPercentage(float hourlySwingPercentage)
+	{
+		//instances of Classes needed throughout OOP
+		WebDriver driver = DriverFactory.getWebDriver()
+		NumberFormat format
+		Number number
+
+		//convert the float parameter to a String to pull the text value off the page
+		String temphourlySwingPercentage = Float.toString(hourlySwingPercentage)
+
+		//Make list of elements involved in the percentage change in price this hour
+		List < WebElement > hourlySwingPercentageList = driver.findElements(By.xpath("//div[@class='_27rSsse3BjeLj7Y1bhIE_9']"))
+
+		//variable representing the sign of the hourly BTC return in dollars, % and text after both with a space between all
+		String hourlySwingVariables = hourlySwingPercentageList.get(0).getText()
+
+		//break the String of the price and the Percentage into two parts, exclude text at the end as the third part
+		String[] parts = hourlySwingVariables.split(" ", 3)
+
+		//variable for the current price of BTC. First element is the sign of the value, third is useless text after
+		temphourlySwingPercentage = parts[1]
+
+		//delete the first '(' from the value pulled off the page
+		temphourlySwingPercentage = temphourlySwingPercentage.substring(1)
+
+		//delete the '%' and the ')' from the value pulled off the page (last two chacters of string).
+		temphourlySwingPercentage = temphourlySwingPercentage.substring(0, temphourlySwingPercentage.length() - 2)
+
+		//convert String/Number to a float to do math on this later
+		hourlySwingPercentage = Float.parseFloat(temphourlySwingPercentage)
+
+		//debug value testing
+		//println("Hourly Swing %: " + hourlySwingPercentage)
+
+		//return float requestsed
+		return hourlySwingPercentage
+	}
+
+
+	//GETS TOTAL BTC OWNED----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+	float getTotalBTCOwned(float totalBTCOwned)
+	{
+		//instances of Classes needed throughout OOP
+		WebDriver driver = DriverFactory.getWebDriver()
+		NumberFormat format
+		Number number
+
+		//convert the float parameter to a String to pull the text value off the page
+		String temptotalBTCOwned = Float.toString(totalBTCOwned)
+
+		//Make list of tables, Quanity of BTC owned is the second element in the second table
+		List < WebElement > twoTablesList = driver.findElements(By.xpath("//div[@class='pPrCXqMj0IQwHcrhZMTmL _1lyLLZqTCp1J8HzkXuYkui']"))
+
+		//variable representing the second table in the list (contains quantity)
+		String tableTwo = twoTablesList.get(1).getText()
+
+		//get rid of all non-numerics in this long string
+		tableTwo = tableTwo.replaceAll("[^\\d. ]", "")
+
+		//debug test to display the non numeric characters in the table
+		//println("Data:" + tableTwo)
+
+		//break the String of the price and the Percentage into five parts, exclude text at the end and extra spaces as the 4th and on part
+		String[] parts = tableTwo.split(" ", 5)
+
+		//variable for total BTC owned
+		temptotalBTCOwned = parts[3]
+
+		//convert String/Number to a float to do math on this later
+		totalBTCOwned = Float.parseFloat(temptotalBTCOwned)
+
+		//debug value testing
+		//println("BTC Owned: " + totalBTCOwned)
+
+		//return the float value requested
+		return totalBTCOwned
+	}
+
+
+	//GETS TOTAL RETURN IN DOLLARS ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+	float getTotalReturnDollars(float totalReturnDollars)
+	{
+		//instances of Classes needed throughout OOP
+		WebDriver driver = DriverFactory.getWebDriver()
+		NumberFormat format
+		Number number
+
+		//convert the float parameter to a String to pull the text value off the page
+		String temptotalReturnDollars = Float.toString(totalReturnDollars)
+
+		//Make list of tables, Quanity of BTC owned is an element in the second table
+		List < WebElement > twoTablesList = driver.findElements(By.xpath("//div[@class='pPrCXqMj0IQwHcrhZMTmL _1lyLLZqTCp1J8HzkXuYkui']"))
+
+		//variable representing the second table in the list (contains quantity)
+		String tableOne = twoTablesList.get(0).getText()
+
+		//get rid of all non-numerics in this long string
+		tableOne = tableOne.replaceAll("[^\\d.\\- ]", "")
+
+		//break the String of the price and the Percentage into two parts, exclude text at the end as the third part
+		String[] parts = tableOne.split(" ", 9)
+
+		//last element in this string of the numbers on the table is the total return %
+		temptotalReturnDollars = parts[7]
+
+		//convert String/Number to a float to do math on this later
+		totalReturnDollars = Float.parseFloat(temptotalReturnDollars)
+
+		//debug value testing
+		//println("Total Return in dollars: " + totalReturnDollars)
+
+		//return float requested
+		return totalReturnDollars
+	}
+
+	//GETS TOTAL RETURN PERCENTAGE----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+	float getTotalReturnPercentage(float totalReturnPercentage)
+	{
+		//instances of Classes needed throughout OOP
+		WebDriver driver = DriverFactory.getWebDriver()
+		NumberFormat format
+		Number number
+
+		//convert the float parameter to a String to pull the text value off the page
+		String temptotalReturnPercentage = Float.toString(totalReturnPercentage)
+
+		//Make list of tables, Quanity of BTC owned is an element in the second table
+		List < WebElement > twoTablesList = driver.findElements(By.xpath("//div[@class='pPrCXqMj0IQwHcrhZMTmL _1lyLLZqTCp1J8HzkXuYkui']"))
+
+		//variable representing the second table in the list (contains quantity)
+		String tableOne = twoTablesList.get(0).getText()
+
+		//get rid of all non-numerics in this long string
+		tableOne = tableOne.replaceAll("[^\\d.\\- ]", "")
+
+		//break the String of the price and the Percentage into two parts, exclude text at the end as the third part
+		String[] parts = tableOne.split(" ", 9)
+
+		//last element in this string of the numbers on the table is the total return %
+		temptotalReturnPercentage = parts[8]
+
+		//convert String/Number to a float to do math on this later
+		totalReturnPercentage = Float.parseFloat(temptotalReturnPercentage)
+
+		//debug value testing
+		//println("Total return %: " + totalReturnPercentage)
+
+		//return float requested
+		return totalReturnPercentage
+	}
+
+	//GETS TOTAL RETURN PERCENTAGE----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+	float getCostOfBTCPurchased(float costOfBTCPurchased)
+	{
+		//instances of Classes needed throughout OOP
+		WebDriver driver = DriverFactory.getWebDriver()
+		NumberFormat format
+		Number number
+
+		//convert the float parameter to a String to pull the text value off the page
+		String tempCostOfBTCPurchased = Float.toString(costOfBTCPurchased)
+
+		//Make list of tables, Quanity of BTC owned is an element in the second table
+		List < WebElement > twoTablesList = driver.findElements(By.xpath("//div[@class='pPrCXqMj0IQwHcrhZMTmL _1lyLLZqTCp1J8HzkXuYkui']"))
+
+		//variable representing the second table in the list (contains quantity)
+		String tableOne = twoTablesList.get(0).getText()
+
+		//get rid of all non-numerics in this long string
+		tableOne = tableOne.replaceAll("[^\\d.\\- ]", "")
+
+		//break the String of the price and the Percentage into two parts, exclude text at the end as the third part
+		String[] parts = tableOne.split(" ", 9)
+
+		//last element in this string of the numbers on the table is the total return %
+		tempCostOfBTCPurchased = parts[2]
+
+		//convert String/Number to a float to do math on this later
+		costOfBTCPurchased = Float.parseFloat(tempCostOfBTCPurchased)
+
+		//debug value testing
+		//println("Cost of BTC Purchased: : " + costOfBTCPurchased)
+
+		//return float requested
+		return costOfBTCPurchased
+	}
+//}
